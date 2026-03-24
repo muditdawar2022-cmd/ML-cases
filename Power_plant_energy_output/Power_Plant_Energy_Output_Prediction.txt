@@ -1,0 +1,91 @@
+# Power Plant Energy Output Prediction
+
+## Project Overview
+
+This project predicts the net energy output (PE) of a combined cycle power plant using environmental sensor readings. The dataset contains 9,568 records with no missing values, and was used to train and compare three machine learning models.
+
+The goal was to identify the best model for predicting PE and understand which environmental features drive power output the most.
+
+---
+
+## Dataset
+
+**File:** CCPP_data.csv  
+**Shape:** 9,568 rows × 5 columns  
+**Features:**
+- AT — Ambient Temperature
+- V — Exhaust Vacuum
+- AP — Ambient Pressure
+- RH — Relative Humidity
+- PE — Net Electrical Energy Output (target variable)
+
+No missing values were found in any column.
+
+---
+
+## Models Tested
+
+Three models were evaluated using 5-fold cross validation on the training set:
+
+| Model | RMSE (CV) | R² (CV) |
+|---|---|---|
+| Linear Regression | 4.572 | 0.928 |
+| Lasso (alpha=0.1) | 4.616 | 0.927 |
+| Random Forest (200 trees) | 3.451 | 0.959 |
+
+**Best model: Random Forest** — selected based on lowest RMSE.
+
+---
+
+## Final Test Results (Random Forest, All 4 Features)
+
+| Metric | Score |
+|---|---|
+| RMSE | 3.231 |
+| R² | 0.964 |
+
+The model explains 96.4% of the variation in power output on unseen test data.
+
+---
+
+## Feature Importance Analysis
+
+Random Forest was used to rank feature importance:
+
+| Feature | Importance |
+|---|---|
+| AT (Ambient Temperature) | 0.901 |
+| V (Exhaust Vacuum) | 0.062 |
+| AP (Ambient Pressure) | 0.018 |
+| RH (Relative Humidity) | 0.018 |
+
+Ambient Temperature alone accounts for 90.1% of predictive power, making it by far the most important feature.
+
+---
+
+## Reduced Feature Test (AT + V Only)
+
+To validate feature importance findings, the model was retrained using only the top 2 features:
+
+| Model | RMSE | R² |
+|---|---|---|
+| All 4 features | 3.231 | 0.964 |
+| Top 2 features (AT, V) | 3.711 | 0.953 |
+
+Using just 2 features still achieves R² of 0.953 — a marginal drop of 1.1% while eliminating AP and RH entirely. This confirms that AP and RH contribute very little to predictive accuracy.
+
+---
+
+## Key Findings
+
+- Random Forest significantly outperforms linear models on this dataset, suggesting non-linear relationships between environmental conditions and power output
+- Ambient Temperature is the dominant predictor of energy output, contributing 90% of feature importance
+- A simplified 2-feature model (AT + V) performs nearly as well as the full model, which has practical implications for sensor requirements in real deployments
+
+---
+
+## Libraries Used
+
+- pandas
+- numpy
+- scikit-learn (Pipeline, StandardScaler, LinearRegression, Lasso, RandomForestRegressor)
