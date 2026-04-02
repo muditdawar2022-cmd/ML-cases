@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "interview-coach-492006",
+  "private_key_id": "b8bf3a196c3b7023d67ed6322ea170b3ea439d0d",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvgIBADANBgkqhkiG9w0BAQEFAASCBKgwggSkAgEAAoIBAQDEPJ7tH2lroVHX\n47aAGZ2jX7OFJWCpHtr7vI1p18zQcVz3u3qhj8rVAw/jPERn8gqBH56uxL+UYSOS\n9s9ww/pA7+inJLGn4lM9ziJVoxdMOIZrKYOsFtvbqvcXxcPgbglwgbRLrGzDCGGC\nzf7qNqUWZqu7ozif37qCNyQvWu5gkoNgyg6NuVmCqw+es4/XeE91VLfYFh7lQ7Lk\nMXcVFL8NWQZNxrRg7SE4tVk2BMA6qZt/MSWBJHm2Ge486c5VhJP8GYZmATOrJl4o\nPH+7wb+PTqBPtiwq8est8tE43CmsNtNQxdtem/n99zAzLShXszXFSkX70Rfw51PH\nxDbzqoEVAgMBAAECggEANImuWvnP9ZrpGI3ErKMvCzByFbGeIWk7Y65lhfLayOuw\n4jp1aI/g1ArP1Bysi8/HdC6NA2l1iTpAlfYyL5SoiX4xoZ43WiVD+AYaNydE84km\no8YnlIlCL5ukL98oxAtxx4dSR/hP3h9+S9Du8LHUnRy72a6nWFZDzt0IeQ01SPE4\n6tJnL/R5WF9milAh8c5HwGHecdQxFbreoNSf+X+/CGXi1u+Tp/RNogsuMY78gHxg\nt99IKjkxSvL3TuSqxr4VjovVsHPIcuGitpSPNNtKF+hwzj/RIhkRaAD5lKheRuXC\n47/bx0/dAotlzBF+0FrUQ0Nk6rmarauWwM+atY4Q+QKBgQDhV7lZJm28mqWQxCN/\nbgVgbtZDvqGuSNls+EYilwSSSejU5/7Fy2Aedp/Zql2VyjnvEw8ee+VIy3G76FXL\n2eYFwEMeFerdK3/+hb/x9wm6IU5uzLrqbMYkVQjHK9iYsgtyH7LOS18fg+Qvg/3x\nOEENkZ+yT3VTUfg7La6h9/5z8wKBgQDe7zEvsYkMRpWauaqky5vSazr57OMUKyMn\nuWO++FVTIjPyTCeMMdALVQZZoRzSB7lWKU9JJo0UqvtFAgbtVe9Sm+EVhhQqVsRR\nkQwYcUFrBL02wQoH94H0LZcdULaalprwiHz0Ksqi8MY5VNKr2MavCxTR+MZBlQI7\nd3iZI5Rg1wKBgQDhHaD1ddWE6D1kfP01bXUDnFaDAOtGUFKdcP2nypRvjFSEdWto\nr77LUBhq+65YWNk9hB3Dh2RML6nkXbtwVbNcpXCnmp+x6aYJYBacI/3cqy9Os0o7\nrQTZAPYu+xd7m8qhbRdUzakus7T+3u6Oz3L1mjgeixCbdzTz8bQW7MePjwKBgQC+\nD4yOjbw6g/7Nv5a1EoVROmw4YPYj3rcFCe/5AvyzeIhy/OwGgP1Oe/mC9nF8umsP\nAv7+bWiAA1lfNuAy/T2g3xZhZELS6dBLfe6i9AOCurKZ+K+VpTTcuPWJX6OeXeHQ\nSXzGKalCiyVkAWXubkzNNRRWAtL7XI9fpXZikMvSVwKBgCRlWm6N6RONWN/fgZb3\nNj39oG10PosEeWfgeGFFl6JecFFHUllMYN2dcPif4tZIuuK+jD9prr7N7+zM9h4b\nLY954X/0sbkDkCnEpm8ZlXhC15y4i4wZr4I3mej0jY/f+SbNZfK3QWsSgwnnk2ml\nDoAt3WV4M9iIiWgiTqF/ojDj\n-----END PRIVATE KEY-----\n",
+  "client_email": "interview-coach@interview-coach-492006.iam.gserviceaccount.com",
+  "client_id": "116073373945703918176",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/interview-coach%40interview-coach-492006.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
