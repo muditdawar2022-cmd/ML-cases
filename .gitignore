@@ -20,3 +20,8 @@ env/
 # OS
 .DS_Store
 Thumbs.db
+
+*.json
+google-key.json
+interview-coach-*.json
+.env
