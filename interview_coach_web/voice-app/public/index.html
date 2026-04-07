@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Interview Copilot</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #0e0e0f; --surface: #1a1a1c; --surface2: #222224;
+    --border: rgba(255,255,255,0.08); --border2: rgba(255,255,255,0.14);
+    --text: #f0efe8; --text2: #9a9990; --text3: #5a5955;
+    --accent: #c8f060; --accent-dim: rgba(200,240,96,0.12);
+    --accent2: #60c8f0; --accent2-dim: rgba(96,200,240,0.12);
+    --red: #ff5f5f; --red-dim: rgba(255,95,95,0.1);
+    --green: #5fcc8a; --green-dim: rgba(95,204,138,0.12);
+    --mono: 'DM Mono', monospace; --sans: 'DM Sans', sans-serif;
+  }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 0 1rem 4rem; }
+  header { width: 100%; max-width: 720px; padding: 2.5rem 0 2rem; border-bottom: 1px solid var(--border); margin-bottom: 2rem; }
+  .wordmark { font-family: var(--mono); font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text3); margin-bottom: 1rem; }
+  h1 { font-size: 26px; font-weight: 300; color: var(--text); letter-spacing: -0.02em; }
+  h1 span { color: var(--accent); font-weight: 500; }
+  .hint { font-size: 13px; color: var(--text3); margin-top: 6px; font-family: var(--mono); }
+  main { width: 100%; max-width: 720px; }
+
+  /* Mode tabs */
+  .mode-row { display: flex; gap: 6px; margin-bottom: 2rem; flex-wrap: wrap; }
+  .mode-btn { padding: 6px 14px; border: 1px solid var(--border); border-radius: 100px; background: transparent; color: var(--text2); font-family: var(--mono); font-size: 11px; letter-spacing: 0.05em; cursor: pointer; transition: all 0.15s; }
+  .mode-btn:hover { border-color: var(--border2); color: var(--text); }
+  .mode-btn.active { border-color: var(--accent); color: var(--accent); background: var(--accent-dim); }
+
+  /* Interview copilot setup panel */
+  #copilot-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 14px; padding: 1.25rem 1.5rem; margin-bottom: 1.5rem; display: none; }
+  #copilot-panel.visible { display: block; }
+  .panel-title { font-family: var(--mono); font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent); margin-bottom: 1.25rem; }
+
+  .input-group { margin-bottom: 1rem; }
+  .input-label { font-family: var(--mono); font-size: 11px; color: var(--text3); letter-spacing: 0.06em; text-transform: uppercase; margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+  .input-badge { font-size: 10px; padding: 2px 8px; border-radius: 100px; font-family: var(--mono); }
+  .badge-jd { background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(200,240,96,0.3); }
+  .badge-stories { background: var(--accent2-dim); color: var(--accent2); border: 1px solid rgba(96,200,240,0.3); }
+
+  .url-row { display: flex; gap: 8px; }
+  .url-input { flex: 1; background: var(--surface2); border: 1px solid var(--border); border-radius: 8px; padding: 10px 12px; color: var(--text); font-family: var(--mono); font-size: 12px; outline: none; transition: border-color 0.15s; }
+  .url-input::placeholder { color: var(--text3); }
+  .url-input:focus { border-color: var(--border2); }
+  .url-input.loaded { border-color: var(--green); }
+  .url-input.error { border-color: var(--red); }
+
+  .load-btn { padding: 10px 16px; border-radius: 8px; border: 1px solid var(--border); background: transparent; color: var(--text2); font-family: var(--mono); font-size: 11px; letter-spacing: 0.05em; cursor: pointer; white-space: nowrap; transition: all 0.15s; flex-shrink: 0; }
+  .load-btn:hover { border-color: var(--border2); color: var(--text); }
+  .load-btn.loading-btn { color: var(--text3); cursor: default; }
+  .load-btn.loaded-btn { border-color: var(--green); color: var(--green); }
+
+  .input-status { font-family: var(--mono); font-size: 11px; margin-top: 5px; min-height: 16px; }
+  .input-status.ok { color: var(--green); }
+  .input-status.err { color: var(--red); }
+  .input-status.loading { color: var(--text3); }
+
+  .copilot-ready { background: var(--green-dim); border: 1px solid rgba(95,204,138,0.25); border-radius: 8px; padding: 10px 14px; font-family: var(--mono); font-size: 12px; color: var(--green); margin-top: 1rem; display: none; }
+  .copilot-ready.visible { display: block; }
+
+  /* Record button */
+  #record-btn { width: 100%; padding: 22px 24px; background: var(--surface); border: 1px solid var(--border); border-radius: 14px; color: var(--text2); font-family: var(--mono); font-size: 14px; letter-spacing: 0.05em; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 12px; transition: all 0.15s; margin-bottom: 1rem; }
+  #record-btn:hover { border-color: var(--border2); color: var(--text); }
+  #record-btn.recording { border-color: var(--red); color: var(--red); background: var(--red-dim); }
+  #record-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+  .rec-dot { width: 8px; height: 8px; border-radius: 50%; background: currentColor; flex-shrink: 0; }
+  .rec-dot.pulse { animation: pulse 1s ease-in-out infinite; }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.3;transform:scale(0.8)} }
+
+  #transcript-live { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 12px 16px; font-size: 14px; color: var(--text2); font-style: italic; min-height: 48px; line-height: 1.6; margin-bottom: 1rem; display: none; }
+  #transcript-live.active { display: block; }
+  #status { font-family: var(--mono); font-size: 12px; color: var(--text3); min-height: 18px; margin-bottom: 1.5rem; display: flex; align-items: center; gap: 8px; }
+  #status.error { color: var(--red); }
+  .spinner { width: 12px; height: 12px; border: 1.5px solid var(--border2); border-top-color: var(--text3); border-radius: 50%; animation: spin 0.6s linear infinite; flex-shrink: 0; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .divider { display: flex; align-items: center; gap: 12px; margin-bottom: 1.5rem; }
+  .divider-line { flex: 1; height: 1px; background: var(--border); }
+  .divider-label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; color: var(--text3); text-transform: uppercase; }
+
+  #conv { display: flex; flex-direction: column; gap: 16px; }
+  .empty { text-align: center; padding: 4rem 0; color: var(--text3); font-family: var(--mono); font-size: 12px; letter-spacing: 0.05em; }
+  .turn { display: flex; flex-direction: column; gap: 8px; }
+  .turn-user { align-self: flex-end; max-width: 85%; background: var(--surface2); border: 1px solid var(--border); border-radius: 14px 14px 4px 14px; padding: 12px 16px; }
+  .turn-you-label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; color: var(--text3); text-transform: uppercase; margin-bottom: 6px; text-align: right; }
+  .turn-user-text { font-size: 14px; line-height: 1.6; color: var(--text); text-align: right; }
+  .turn-claude { align-self: flex-start; max-width: 92%; padding: 4px 0 4px 16px; border-left: 2px solid var(--accent); }
+  .turn-claude.loading { border-left-color: var(--border2); }
+  .turn-claude-label { font-family: var(--mono); font-size: 10px; letter-spacing: 0.1em; color: var(--accent); text-transform: uppercase; margin-bottom: 6px; }
+  .turn-claude.loading .turn-claude-label { color: var(--text3); }
+  .turn-claude-text { font-size: 15px; line-height: 1.7; color: var(--text); white-space: pre-wrap; }
+  .turn-claude.loading .turn-claude-text { color: var(--text3); font-style: italic; }
+
+  .clear-row { margin-top: 2rem; text-align: center; }
+  #clear-btn { background: none; border: 1px solid var(--border); color: var(--text3); font-family: var(--mono); font-size: 11px; letter-spacing: 0.05em; padding: 6px 16px; border-radius: 100px; cursor: pointer; transition: all 0.15s; }
+  #clear-btn:hover { border-color: var(--border2); color: var(--text2); }
+
+  @media (max-width: 480px) {
+    h1 { font-size: 22px; }
+    #record-btn { padding: 20px; font-size: 13px; }
+    .url-row { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="wordmark">Voice Assistant · Claude</div>
+  <h1>Talk to <span>Claude</span></h1>
+  <div class="hint">tap the button to start · tap again to stop</div>
+</header>
+<main>
+  <div class="mode-row" id="mode-row">
+    <button class="mode-btn active" data-mode="general">General</button>
+    <button class="mode-btn" data-mode="cooking">Cooking</button>
+    <button class="mode-btn" data-mode="advice">Advice</button>
+    <button class="mode-btn" data-mode="fun">Fun</button>
+    <button class="mode-btn" data-mode="interview">Interview Copilot</button>
+  </div>
+
+  <!-- Interview Copilot Setup Panel -->
+  <div id="copilot-panel">
+    <div class="panel-title">Interview Setup</div>
+
+    <div class="input-group">
+      <div class="input-label">
+        <span class="input-badge badge-jd">Link A</span>
+        Job Description URL
+      </div>
+      <div class="url-row">
+        <input type="url" class="url-input" id="jd-url" placeholder="https://jobs.company.com/role..." />
+        <button class="load-btn" id="jd-load-btn" onclick="loadURL('jd')">Load JD</button>
+      </div>
+      <div class="input-status" id="jd-status"></div>
+    </div>
+
+    <div class="input-group">
+      <div class="input-label">
+        <span class="input-badge badge-stories">Link B</span>
+        Story Bank (Google Drive / Notion / URL)
+      </div>
+      <div class="url-row">
+        <input type="url" class="url-input" id="stories-url" placeholder="https://docs.google.com/..." />
+        <button class="load-btn" id="stories-load-btn" onclick="loadURL('stories')">Load Stories</button>
+      </div>
+      <div class="input-status" id="stories-status"></div>
+    </div>
+
+    <div class="copilot-ready" id="copilot-ready">
+      ✓ Copilot ready — both documents loaded. Start recording when the interviewer speaks.
+    </div>
+  </div>
+
+  <button id="record-btn" type="button">
+    <span class="rec-dot" id="dot"></span>
+    <span id="btn-label">Tap to start recording</span>
+  </button>
+  <div id="transcript-live"></div>
+  <div id="status"></div>
+
+  <div class="divider">
+    <div class="divider-line"></div>
+    <div class="divider-label">Conversation</div>
+    <div class="divider-line"></div>
+  </div>
+  <div id="conv"><div class="empty">your conversation will appear here</div></div>
+  <div class="clear-row"><button id="clear-btn">clear conversation</button></div>
+</main>
+
+<script>
+const SYSTEM_PROMPTS = {
+  general: "You are a warm, friendly, helpful assistant. The user is speaking via voice. Respond conversationally, clearly, and without any markdown formatting or bullet points. Keep responses concise — 2 to 4 sentences unless more detail is clearly needed.",
+  cooking: "You are a friendly cooking assistant and recipe advisor. The user is speaking via voice. Give practical, clear cooking advice and recipe suggestions. No markdown — conversational, warm, and encouraging.",
+  advice: "You are a thoughtful, empathetic life advisor. The user is speaking via voice. Give honest, caring, practical advice. No markdown — warm conversational tone, 2 to 4 sentences unless more is needed.",
+  fun: "You are a witty, playful, fun conversationalist. The user is speaking via voice. Be entertaining, funny, and engaging. No markdown — pure fun conversation.",
+  interview: "" // built dynamically from loaded docs
+};
+
+const INTERVIEW_BASE_PROMPT = `You are an expert Interview Copilot and Coach. Your role is to listen to an ongoing interview conversation and provide the interviewee with concise, structured, and high-quality response suggestions in real time.
+
+Inputs Provided:
+- Link A (Job Description): {JD_CONTENT}
+- Link B (Candidate Story Bank): {STORIES_CONTENT}
+
+Your Objectives:
+1. Generate succinct answers the candidate can quickly read and speak naturally.
+2. Tailor all responses to the job requirements from the Job Description.
+3. Leverage relevant stories from the Story Bank when answering behavioral or experience-based questions.
+4. Support follow-up questions, even when the candidate does not remember details.
+5. Ensure answers are clear, structured, and sound natural.
+
+Answering Guidelines:
+- Keep responses SHORT: 20–60 words max using bullet points or short phrases
+- No filler language. Prioritize clarity + impact.
+- For behavioral questions use compressed STAR: Context (1 line) → Action (2–3 key actions) → Impact (quantified if possible). Do NOT label STAR explicitly.
+- For follow-ups: infer missing details using the JD and story context. Keep answers grounded and realistic.
+- Always align answers with key skills, tools, metrics, and domain language from the JD.
+- For product/strategy/analytical questions use: Goal → Problem → Approach → Metrics
+- For memory gaps: fill intelligently using similar experiences, industry best practices, and role expectations.
+
+Output Style:
+- Tight bullet points only
+- No long paragraphs
+- No unnecessary explanation
+- Sound like something a human would naturally say
+
+Example format:
+• Built dashboard for ops team
+• Defined metrics: conversion, latency, user activity
+• Partnered with product + engineering
+• Enabled faster decisions → cut reporting time ~30%
+
+You are not a teacher. You are a real-time performance enhancer. Be fast, sharp, and relevant.`;
+
+let isRecording = false, recognition = null, finalTranscript = '', interimText = '';
+let conversationHistory = [], isThinking = false, activeMode = 'general';
+let jdContent = '', storiesContent = '';
+let jdLoaded = false, storiesLoaded = false;
+
+const recordBtn = document.getElementById('record-btn');
+const dot = document.getElementById('dot');
+const btnLabel = document.getElementById('btn-label');
+const statusEl = document.getElementById('status');
+const convEl = document.getElementById('conv');
+const liveEl = document.getElementById('transcript-live');
+const copilotPanel = document.getElementById('copilot-panel');
+const copilotReady = document.getElementById('copilot-ready');
+
+document.getElementById('mode-row').addEventListener('click', e => {
+  const b = e.target.closest('.mode-btn'); if (!b) return;
+  document.querySelectorAll('.mode-btn').forEach(x => x.classList.remove('active'));
+  b.classList.add('active');
+  activeMode = b.dataset.mode;
+  copilotPanel.classList.toggle('visible', activeMode === 'interview');
+  updateRecordBtn();
+});
+
+document.getElementById('clear-btn').addEventListener('click', () => {
+  conversationHistory = [];
+  convEl.innerHTML = '<div class="empty">your conversation will appear here</div>';
+  setStatus(''); liveEl.textContent = ''; liveEl.classList.remove('active');
+});
+
+recordBtn.addEventListener('click', toggleRecording);
+
+document.addEventListener('keydown', e => {
+  if (e.key === ' ' && isRecording) { e.preventDefault(); stopRecording(false); }
+  if (e.key === 'Escape' && isRecording) { e.preventDefault(); stopRecording(true); }
+});
+
+function updateRecordBtn() {
+  if (activeMode === 'interview' && !jdLoaded && !storiesLoaded) {
+    recordBtn.disabled = false; // still allow, just with warning
+  } else {
+    recordBtn.disabled = false;
+  }
+}
+
+function checkCopilotReady() {
+  if (jdLoaded && storiesLoaded) {
+    copilotReady.classList.add('visible');
+    // Build the interview system prompt
+    SYSTEM_PROMPTS.interview = INTERVIEW_BASE_PROMPT
+      .replace('{JD_CONTENT}', jdContent.substring(0, 8000))
+      .replace('{STORIES_CONTENT}', storiesContent.substring(0, 8000));
+  } else {
+    copilotReady.classList.remove('visible');
+  }
+}
+
+async function loadURL(type) {
+  const urlInput = document.getElementById(type === 'jd' ? 'jd-url' : 'stories-url');
+  const statusDiv = document.getElementById(type === 'jd' ? 'jd-status' : 'stories-status');
+  const loadBtn = document.getElementById(type === 'jd' ? 'jd-load-btn' : 'stories-load-btn');
+  const url = urlInput.value.trim();
+
+  if (!url) { statusDiv.textContent = 'Please paste a URL first'; statusDiv.className = 'input-status err'; return; }
+
+  // Try to validate URL
+  try { new URL(url); } catch(e) { statusDiv.textContent = 'Invalid URL format'; statusDiv.className = 'input-status err'; return; }
+
+  statusDiv.textContent = 'Fetching content...'; statusDiv.className = 'input-status loading';
+  loadBtn.textContent = 'Loading...'; loadBtn.className = 'load-btn loading-btn'; loadBtn.disabled = true;
+  urlInput.classList.remove('loaded', 'error');
+
+  try {
+    // Fetch via our proxy endpoint
+    const res = await fetch('/api/fetch-url', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url })
+    });
+    const data = await res.json();
+
+    if (data.error) throw new Error(data.error);
+
+    const content = data.content || '';
+    if (!content || content.length < 50) throw new Error('Page returned no readable content');
+
+    if (type === 'jd') { jdContent = content; jdLoaded = true; }
+    else { storiesContent = content; storiesLoaded = true; }
+
+    const wordCount = content.split(/\s+/).length;
+    statusDiv.textContent = `✓ Loaded — ${wordCount} words extracted`;
+    statusDiv.className = 'input-status ok';
+    urlInput.classList.add('loaded');
+    loadBtn.textContent = '✓ Loaded';
+    loadBtn.className = 'load-btn loaded-btn';
+    checkCopilotReady();
+  } catch(err) {
+    statusDiv.textContent = '✗ ' + (err.message || 'Could not fetch URL');
+    statusDiv.className = 'input-status err';
+    urlInput.classList.add('error');
+    loadBtn.textContent = type === 'jd' ? 'Load JD' : 'Load Stories';
+    loadBtn.className = 'load-btn'; loadBtn.disabled = false;
+    if (type === 'jd') { jdLoaded = false; } else { storiesLoaded = false; }
+    checkCopilotReady();
+  }
+}
+
+function setStatus(msg, isError, spinner) {
+  statusEl.innerHTML = ''; statusEl.className = isError ? 'error' : '';
+  if (spinner) { const s = document.createElement('div'); s.className = 'spinner'; statusEl.appendChild(s); }
+  if (msg) statusEl.appendChild(document.createTextNode(msg));
+}
+
+function setupRecognition() {
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if (!SR) { setStatus('Please use Chrome or Edge for voice recording', true); return null; }
+  const r = new SR();
+  r.continuous = true; r.interimResults = true; r.lang = 'en-US';
+  r.onresult = e => {
+    let fin = '', interim = '';
+    for (let i = e.resultIndex; i < e.results.length; i++) {
+      if (e.results[i].isFinal) fin += e.results[i][0].transcript;
+      else interim += e.results[i][0].transcript;
+    }
+    if (fin) finalTranscript += fin;
+    interimText = interim;
+    const disp = (finalTranscript + ' ' + interimText).trim();
+    if (disp) { liveEl.textContent = disp; liveEl.classList.add('active'); }
+  };
+  r.onerror = e => {
+    if (e.error === 'not-allowed') setStatus('Mic access denied — allow microphone in browser settings', true);
+    else if (e.error !== 'aborted') setStatus('Mic error: ' + e.error, true);
+    resetBtn(); isRecording = false;
+  };
+  r.onend = () => { if (isRecording) { try { r.start(); } catch(ex) {} } };
+  return r;
+}
+
+function startRecording() {
+  if (isThinking) { setStatus('Please wait for the response to finish'); return; }
+  if (activeMode === 'interview' && !SYSTEM_PROMPTS.interview) {
+    setStatus('Load at least one document above before recording', true); return;
+  }
+  recognition = setupRecognition(); if (!recognition) return;
+  finalTranscript = ''; interimText = '';
+  liveEl.textContent = '...'; liveEl.classList.add('active');
+  try {
+    recognition.start(); isRecording = true;
+    recordBtn.classList.add('recording'); dot.classList.add('pulse');
+    btnLabel.textContent = 'Listening... tap to stop';
+    setStatus('Recording — speak now');
+  } catch(e) { setStatus('Could not start mic: ' + e.message, true); }
+}
+
+function stopRecording(cancel) {
+  if (!isRecording) return;
+  isRecording = false;
+  if (recognition) { try { recognition.stop(); } catch(e) {} recognition = null; }
+  resetBtn(); liveEl.classList.remove('active');
+  const text = (finalTranscript + ' ' + interimText).trim();
+  if (cancel) { setStatus('Cancelled'); return; }
+  if (!text) { setStatus('Nothing heard — try again'); return; }
+  sendToClaude(text);
+}
+
+function resetBtn() {
+  recordBtn.classList.remove('recording'); dot.classList.remove('pulse');
+  btnLabel.textContent = 'Tap to start recording';
+}
+
+function toggleRecording() {
+  if (isRecording) stopRecording(false); else startRecording();
+}
+
+function esc(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function addTurn(userText) {
+  const empty = convEl.querySelector('.empty'); if (empty) empty.remove();
+  const turn = document.createElement('div'); turn.className = 'turn';
+  const userDiv = document.createElement('div'); userDiv.className = 'turn-user';
+  userDiv.innerHTML = `<div class="turn-you-label">${activeMode === 'interview' ? 'Interviewer' : 'You'}</div><div class="turn-user-text">${esc(userText)}</div>`;
+  const claudeDiv = document.createElement('div'); claudeDiv.className = 'turn-claude loading';
+  claudeDiv.innerHTML = `<div class="turn-claude-label">${activeMode === 'interview' ? 'Your Answer' : 'Claude'}</div><div class="turn-claude-text">thinking...</div>`;
+  turn.appendChild(userDiv); turn.appendChild(claudeDiv);
+  convEl.appendChild(turn);
+  claudeDiv.scrollIntoView({ behavior: 'smooth', block: 'end' });
+  return claudeDiv;
+}
+
+async function sendToClaude(text) {
+  isThinking = true;
+  setStatus('Getting response...', false, true);
+  conversationHistory.push({ role: 'user', content: text });
+  const claudeDiv = addTurn(text);
+
+  const systemPrompt = activeMode === 'interview'
+    ? (SYSTEM_PROMPTS.interview || INTERVIEW_BASE_PROMPT.replace('{JD_CONTENT}', 'Not provided').replace('{STORIES_CONTENT}', 'Not provided'))
+    : SYSTEM_PROMPTS[activeMode];
+
+  try {
+    const res = await fetch('/api/chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1024,
+        system: systemPrompt,
+        messages: conversationHistory
+      })
+    });
+    const data = await res.json();
+    if (data.error) {
+      claudeDiv.classList.remove('loading');
+      claudeDiv.querySelector('.turn-claude-text').textContent = 'Error: ' + data.error.message;
+      conversationHistory.pop(); setStatus('Error — try again', true);
+    } else {
+      const reply = (data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('');
+      claudeDiv.classList.remove('loading');
+      claudeDiv.querySelector('.turn-claude-text').textContent = reply;
+      conversationHistory.push({ role: 'assistant', content: reply });
+      setStatus('Ready — tap to record again');
+    }
+  } catch(err) {
+    claudeDiv.classList.remove('loading');
+    claudeDiv.querySelector('.turn-claude-text').textContent = 'Something went wrong. Please try again.';
+    conversationHistory.pop(); setStatus('Connection error', true);
+  }
+  isThinking = false;
+}
+</script>
+</body>
+</html>
