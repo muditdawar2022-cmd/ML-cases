@@ -17,7 +17,7 @@
     --green: #5fcc8a; --green-dim: rgba(95,204,138,0.12);
     --mono: 'DM Mono', monospace; --sans: 'DM Sans', sans-serif;
   }
-  body { background: var(--bg); color: var(--text); font-family: var(--sans); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 0 1rem 4rem; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 0 1rem 0; }
   header { width: 100%; max-width: 720px; padding: 2.5rem 0 2rem; border-bottom: 1px solid var(--border); margin-bottom: 2rem; }
   .wordmark { font-family: var(--mono); font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase; color: var(--text3); margin-bottom: 1rem; }
   h1 { font-size: 26px; font-weight: 300; color: var(--text); letter-spacing: -0.02em; }
@@ -81,6 +81,7 @@
   .turn-claude-text { font-size: 15px; line-height: 1.7; color: var(--text); white-space: pre-wrap; }
   .turn-claude.loading .turn-claude-text { color: var(--text3); font-style: italic; }
   .clear-row { margin-top: 2rem; text-align: center; }
+  .record-bottom { position: sticky; bottom: 0; background: var(--bg); border-top: 1px solid var(--border); padding: 1rem 0 1.5rem; margin-top: 1.5rem; width: 100%; }
   #clear-btn { background: none; border: 1px solid var(--border); color: var(--text3); font-family: var(--mono); font-size: 11px; letter-spacing: 0.05em; padding: 6px 16px; border-radius: 100px; cursor: pointer; transition: all 0.15s; }
   #clear-btn:hover { border-color: var(--border2); color: var(--text2); }
   @media (max-width: 480px) {
@@ -134,13 +135,6 @@
     </div>
   </div>
 
-  <button id="record-btn" type="button">
-    <span class="rec-dot" id="dot"></span>
-    <span id="btn-label">Tap to start recording</span>
-  </button>
-  <div id="transcript-live"></div>
-  <div id="status"></div>
-
   <div class="divider">
     <div class="divider-line"></div>
     <div class="divider-label">Conversation</div>
@@ -148,6 +142,15 @@
   </div>
   <div id="conv"><div class="empty">your conversation will appear here</div></div>
   <div class="clear-row"><button id="clear-btn">clear conversation</button></div>
+
+  <div class="record-bottom">
+    <div id="transcript-live"></div>
+    <div id="status"></div>
+    <button id="record-btn" type="button">
+      <span class="rec-dot" id="dot"></span>
+      <span id="btn-label">Tap to start recording</span>
+    </button>
+  </div>
 </main>
 
 <script>
